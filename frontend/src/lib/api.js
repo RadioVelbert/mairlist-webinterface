@@ -115,10 +115,6 @@ export function searchItems(q, fields) {
   return request(`/search${qs({ q, fields: fields ? fields.join(",") : undefined })}`);
 }
 
-export function getCuePoints() {
-  return request("/cuepoints");
-}
-
 export function getAttributeDefinitions() {
   return request("/attributes/definitions");
 }
