@@ -20,17 +20,10 @@ import {
 } from "../components/treeUtils";
 import Sidebar from "../components/Sidebar";
 import { isContainerItem, containerKindLabel } from "../lib/itemRowStyle";
+import { formatDate as formatHistoryDate } from "../lib/historyStats";
+import { mmss as formatLength } from "../lib/formatters";
 
 // --- Helpers ---
-
-const formatDate = (iso) => iso.replace("T", "  ");
-
-const formatLength = (sec) => {
-  const total = Math.floor(sec);
-  const m = Math.floor(total / 60);
-  const s = total % 60;
-  return `${m}:${String(s).padStart(2, "0")}`;
-};
 
 const capitalize = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 
@@ -1612,7 +1605,7 @@ export default function MairListDB({ onEditItem, onNavigate }) {
                     {isContainerItem(item) ? containerKindLabel(item) : capitalize(item.type)}
                   </td>
                   <td className="px-4 py-3 text-zinc-400">{formatLength(item.duration)}</td>
-                  <td className="px-4 py-3 text-zinc-500">{formatDate(item.updatedAt)}</td>
+                  <td className="px-4 py-3 text-zinc-500">{formatHistoryDate(item.updatedAt)}</td>
                   <td className="px-4 py-3 text-zinc-500">{item.comment || "-"}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-2">

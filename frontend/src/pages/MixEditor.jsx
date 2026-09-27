@@ -9,23 +9,9 @@ import { useAuth } from "../lib/AuthContext";
 import Sidebar from "../components/Sidebar";
 import { mixPlayer, preloadBuffers, resumeContext } from "../lib/mixPlayer";
 import { CUE_POINTS } from "../lib/cuePoints";
+import { mmss, mmssHundredths } from "../lib/formatters";
 
 // --- Helpers ---
-
-const mmss = (sec) => {
-  if (sec == null || Number.isNaN(sec)) return "0:00";
-  const t = Math.max(0, Math.floor(sec));
-  return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}`;
-};
-
-// MM:SS.ss — used for chip time labels and the drag drop-time tooltip.
-const mmssHundredths = (sec) => {
-  if (sec == null || Number.isNaN(sec)) return "0:00.00";
-  const t = Math.max(0, sec);
-  const m = Math.floor(t / 60);
-  const s = t - m * 60;
-  return `${m}:${s.toFixed(2).padStart(5, "0")}`;
-};
 
 const WAVE_COLOR = "#52525b"; // zinc-600
 const PROGRESS_COLOR = "#f97316"; // orange-500

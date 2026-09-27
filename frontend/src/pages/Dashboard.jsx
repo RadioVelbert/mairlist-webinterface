@@ -3,14 +3,7 @@ import { LayoutDashboard, Music, HardDrive, Folder, Users, RefreshCw, AlertTrian
 import { getDashboard, getListeners, getPlaylistsByDate, getPlaylistById } from "../lib/api";
 import { useAuth } from "../lib/AuthContext";
 import Sidebar from "../components/Sidebar";
-
-const pad2 = (n) => String(n).padStart(2, "0");
-
-const formatTime = (value) => {
-  if (!value) return "–";
-  const match = /(\d{2}):(\d{2}):(\d{2})/.exec(value);
-  return match ? `${match[1]}:${match[2]}` : value;
-};
+import { pad2, formatClockTimeShort as formatTime } from "../lib/formatters";
 
 const todayKey = () => new Date().toISOString().slice(0, 10);
 

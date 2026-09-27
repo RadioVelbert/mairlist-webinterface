@@ -14,6 +14,7 @@ import {
 } from "../lib/api";
 import { aggregateHistory, formatDate as formatHistoryDate } from "../lib/historyStats";
 import { CUE_POINTS } from "../lib/cuePoints";
+import { mmss } from "../lib/formatters";
 import { useAuth } from "../lib/AuthContext";
 import Sidebar from "../components/Sidebar";
 import { isContainerItem } from "../lib/itemRowStyle";
@@ -118,13 +119,6 @@ const formatTimecode = (sec) => {
   const s = (sec % 60).toFixed(2).padStart(5, "0");
   return `${m}:${s}`;
 };
-
-const mmss = (sec) => {
-  const t = Math.floor(sec);
-  return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}`;
-};
-
-const formatDate = (iso) => (iso ?? "").replace("T", "  ");
 
 // Cue points are shown and edited as seconds with fractional part (e.g.
 // 140.533). Whether mAirList actually stores them this way internally is

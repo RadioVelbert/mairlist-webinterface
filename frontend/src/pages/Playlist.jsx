@@ -21,12 +21,9 @@ import {
   ContainerEditor, RegionContainerEditor, NewsContainerEditor,
   isRegionContainerItem, isNewsContainerItem, isEditableContainerItem,
 } from "../components/ContainerEditors";
+import { pad2, toDateStr, mmss as formatLength } from "../lib/formatters";
 
 // --- Helpers ---
-
-const pad2 = (n) => String(n).padStart(2, "0");
-
-const toDateStr = (d) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
 
 const parseDateStr = (s) => {
   const [y, m, d] = s.split("-").map(Number);
@@ -42,13 +39,6 @@ const MONTH_NAMES = [
 const formatLongDate = (dateStr) => {
   const d = parseDateStr(dateStr);
   return `${WEEKDAY_NAMES[d.getDay()]}, ${d.getDate()}. ${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`;
-};
-
-const formatLength = (sec) => {
-  const total = Math.floor(sec);
-  const m = Math.floor(total / 60);
-  const s = total % 60;
-  return `${m}:${pad2(s)}`;
 };
 
 const formatTotalDuration = (sec) => {

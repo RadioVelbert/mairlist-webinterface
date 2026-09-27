@@ -3,19 +3,10 @@ import { ScrollText, RefreshCw } from "lucide-react";
 import { getLogs } from "../lib/api";
 import { useAuth } from "../lib/AuthContext";
 import Sidebar from "../components/Sidebar";
+import { pad2, toDateStr, formatClockTime as formatTime } from "../lib/formatters";
 
 const inputClass =
   "rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 outline-none transition-colors placeholder:text-zinc-600 focus:border-zinc-700";
-
-const pad2 = (n) => String(n).padStart(2, "0");
-
-const toDateStr = (d) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
-
-const formatTime = (starttime) => {
-  if (!starttime) return "–";
-  const match = /(\d{2}):(\d{2}):(\d{2})/.exec(starttime);
-  return match ? `${match[1]}:${match[2]}:${match[3]}` : starttime;
-};
 
 const formatDuration = (sec) => {
   if (sec == null) return "–";
