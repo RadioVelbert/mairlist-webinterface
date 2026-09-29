@@ -21,10 +21,20 @@ Der mAirList Datenbankclient läuft nur unter Windows. Für ein dezentral organi
 
 Vorbild ist das 2023 begonnene Projekt **TubeLive**. Der Look ist in [`DESIGN.md`](DESIGN.md) als verbindliches Design System festgehalten.
 
+## 🚀 Installation und Betrieb
+
+| Weg | Anleitung |
+|---|---|
+| 🐳 **Coolify (Docker)** | [`COOLIFY.md`](COOLIFY.md): GitHub anbinden, Ressource anlegen, Volume, alle Umgebungsvariablen, TLS-Zertifikat des mAirListDB Servers, Fehlerbehebung |
+| 🪟 **Windows Server** (Node.js + pm2) | [`DEPLOYMENT.md`](DEPLOYMENT.md) |
+| 💻 **Lokale Entwicklung** | [`SETUP.md`](SETUP.md) |
+
 ## 📂 Weitere Doku
 
 | Datei | Inhalt |
 |---|---|
+| [`COOLIFY.md`](COOLIFY.md) | Setup-Guide für den Betrieb als Docker-Container unter Coolify |
+| [`DEPLOYMENT.md`](DEPLOYMENT.md) | Deployment direkt auf dem Windows Server |
 | [`docs/FEATURES.md`](docs/FEATURES.md) | Vollständiger Funktionskatalog nach mAirList Doku, mit Status je Funktion |
 | [`DESIGN.md`](DESIGN.md) | Design System (Farben, Layout, Komponenten) |
 | [`SETUP.md`](SETUP.md) | Lokale Entwicklung, Git, Projektstruktur |

@@ -15,7 +15,7 @@
 // item/folder/playlist endpoints) — so it stays outside the concurrency
 // limiter and retry queue on purpose.
 
-const { BASE_URL, REQUEST_TIMEOUT_MS, authHeader, ApiNotFoundError, ApiUnreachableError } = require("./apiClient");
+const { BASE_URL, REQUEST_TIMEOUT_MS, apiFetch, authHeader, ApiNotFoundError, ApiUnreachableError } = require("./apiClient");
 
 const STORAGE_FILE_PATH_RE = /^\/storages\/([^/]+)\/files\/(.+)$/;
 
@@ -56,7 +56,7 @@ async function getAudioStream(item, quality = "default") {
 
   let response;
   try {
-    response = await fetch(url, {
+    response = await apiFetch(url, {
       headers: { Authorization: authHeader() },
       signal: controller.signal,
     });

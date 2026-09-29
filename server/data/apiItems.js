@@ -6,7 +6,7 @@
 // distinct-value search — everything keyed off /api/v1/items and the
 // item shape itself.
 
-const { apiRequest, BASE_URL, STATION, REQUEST_TIMEOUT_MS, authHeader, ApiNotFoundError, ApiUnreachableError, warnedOnce, warnOnceUnexpectedShape, notImplemented } = require("./apiClient");
+const { apiRequest, apiFetch, BASE_URL, STATION, REQUEST_TIMEOUT_MS, authHeader, ApiNotFoundError, ApiUnreachableError, warnedOnce, warnOnceUnexpectedShape, notImplemented } = require("./apiClient");
 const { CUE_TO_DB, DB_TO_CUE, typeToCode } = require("./shared");
 const { getFolders } = require("./apiFolders");
 const { resolveStorageFile } = require("./apiAudio");
@@ -1053,7 +1053,7 @@ async function uploadFile(storageId, fileBuffer, originalFilename, mimeType, fol
 
   let response;
   try {
-    response = await fetch(url, {
+    response = await apiFetch(url, {
       method: "POST",
       headers: {
         Authorization: authHeader(),

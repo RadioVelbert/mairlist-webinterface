@@ -16,6 +16,11 @@ frontend/dist-ssr/
 *.log
 npm-debug.log*
 
+# Private Schlüssel nie committen — in server/certs/ gehören nur Zertifikate
+*.key
+*-key.pem
+*_key.pem
+
 # Environment
 .env
 .env.local

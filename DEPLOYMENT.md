@@ -1,5 +1,8 @@
 # Deployment — Windows Server
 
+Alternative: Betrieb als Docker-Container unter Coolify, siehe
+[`COOLIFY.md`](COOLIFY.md).
+
 ## Voraussetzungen
 - Windows Server mit mAirList 6.0 (bereits vorhanden)
 - Port 8840 ist für mAirList DB REST reserviert, wird nicht angefasst

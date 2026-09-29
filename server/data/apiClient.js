@@ -16,6 +16,47 @@ const STATION = process.env.API_DB_STATION || "1";
 
 const REQUEST_TIMEOUT_MS = 10000;
 
+// ---- TLS certificate pinning ----
+//
+// The mAirListDB Server's TLS port typically uses a self-signed certificate
+// that carries the server's IP only as CN, with no subjectAltName. Node
+// accepts an IP host only via an IP SAN, so trusting the certificate via
+// NODE_EXTRA_CA_CERTS still fails with ERR_TLS_CERT_ALTNAME_INVALID.
+// API_DB_TLS_CERT instead pins exactly that certificate for mAirListDB
+// requests only: it replaces the default CA list for these connections, so
+// only a server holding that certificate's key gets through, and the
+// hostname check adds nothing on top and is skipped. Relative paths resolve
+// against the server/ directory. The file may be PEM or DER (Windows .cer
+// files come in both); X509Certificate reads either and normalizes to the
+// PEM that the `ca` option requires. undici is required lazily so setups
+// without API_DB_TLS_CERT don't depend on it.
+const API_DB_TLS_CERT = process.env.API_DB_TLS_CERT;
+
+function createApiFetch() {
+  if (!API_DB_TLS_CERT) return fetch;
+
+  const fs = require("fs");
+  const path = require("path");
+  const { X509Certificate } = require("crypto");
+  const { Agent, fetch: undiciFetch } = require("undici");
+
+  const certPath = path.resolve(__dirname, "..", API_DB_TLS_CERT);
+  let ca;
+  try {
+    ca = new X509Certificate(fs.readFileSync(certPath)).toString();
+  } catch (err) {
+    throw new Error(`API_DB_TLS_CERT: kein lesbares Zertifikat unter ${certPath} (${err.code || err.message})`);
+  }
+  console.log(`mAirListDB Server TLS: gepinntes Zertifikat ${certPath}`);
+
+  const dispatcher = new Agent({ connect: { ca, checkServerIdentity: () => undefined } });
+  return (url, options) => undiciFetch(url, { ...options, dispatcher });
+}
+
+// Every request to the mAirListDB Server goes through apiFetch() instead of
+// the global fetch() so the pinned certificate above applies everywhere.
+const apiFetch = createApiFetch();
+
 // ---- concurrency limiter ----
 //
 // The mAirListDB Server's dbserver.ini caps MaxCachedConnections at 5 by
@@ -143,7 +184,7 @@ async function doApiRequest(method, path, { query = {}, rawFlags = [], body, for
 
   let response;
   try {
-    response = await fetch(url, {
+    response = await apiFetch(url, {
       method,
       headers: {
         Authorization: authHeader(),
@@ -231,6 +272,7 @@ module.exports = {
   BASE_URL,
   STATION,
   REQUEST_TIMEOUT_MS,
+  apiFetch,
   apiRequest,
   authHeader,
   DatabaseLockedError,

@@ -10,6 +10,19 @@ const authRoutes = require("./routes/auth");
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Hinter einem Reverse Proxy (z.B. Traefik unter Coolify) wäre req.ip sonst
+// immer die Proxy-IP, und die IP-basierte Login-Sperre träfe alle Nutzer
+// gleichzeitig. Nur setzen, wenn wirklich ein Proxy davor sitzt — sonst
+// können Clients ihre IP per X-Forwarded-For fälschen.
+// Wert wie bei Express: Anzahl Proxy-Hops ("1"), "true" oder IP/Subnetz-Liste.
+const TRUST_PROXY = process.env.TRUST_PROXY;
+if (TRUST_PROXY && TRUST_PROXY !== "false") {
+  let trust = TRUST_PROXY;
+  if (/^\d+$/.test(TRUST_PROXY)) trust = Number(TRUST_PROXY);
+  else if (TRUST_PROXY === "true") trust = true;
+  app.set("trust proxy", trust);
+}
+
 // CORS: nur vom lokalen Vite-Dev-Server und dem eigenen Host erlauben.
 // Für Produktion ALLOWED_ORIGINS per Env setzen, z.B. "https://radio.example.com"
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000,http://localhost:5173,http://localhost:4173').split(',');
@@ -62,4 +75,5 @@ app.listen(PORT, () => {
   console.log(`mAirList webinterface API running on http://localhost:${PORT}`);
   console.log(`Data source: ${process.env.DATA_SOURCE || "mock"}`);
   console.log(`CORS allowed origins: ${ALLOWED_ORIGINS.join(", ")}`);
+  console.log(`Trust proxy: ${app.get("trust proxy") || "aus"}`);
 });

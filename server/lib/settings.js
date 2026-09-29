@@ -1,10 +1,12 @@
 // Panel-eigene Einstellungen (nicht mAirList-Konfiguration), persistiert als
 // server/settings.json. Datei wird mit Defaults angelegt falls nicht vorhanden.
+// SETTINGS_PATH legt die Datei woanders ab, z.B. auf ein persistentes
+// Docker-Volume (siehe Dockerfile).
 
 const fs = require("fs");
 const path = require("path");
 
-const SETTINGS_PATH = path.join(__dirname, "..", "settings.json");
+const SETTINGS_PATH = process.env.SETTINGS_PATH || path.join(__dirname, "..", "settings.json");
 
 const DEFAULT_SETTINGS = {
   stationName: "Mein Radio",

@@ -1,0 +1,28 @@
+# Git / Editor
+.git
+.gitignore
+.claude
+.vscode
+.idea
+
+# Dependencies und Build-Artefakte werden im Image frisch erzeugt
+**/node_modules
+frontend/dist
+
+# Lokale Secrets nie ins Image backen — Coolify setzt die Env-Variablen
+**/.env
+**/.env.*
+
+# mAirList Datenbank und lokale Laufzeitdaten
+**/*.mldb
+**/*.mldb-wal
+**/*.mldb-shm
+server/webinterface-auth.db*
+server/settings.json
+
+# Logs / Doku
+**/*.log
+docs
+*.md
+Dockerfile
+.dockerignore
