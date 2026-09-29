@@ -1,8 +1,12 @@
 const crypto = require("crypto");
 const express = require("express");
 const router = express.Router();
+// Echte Benutzerverwaltung (webAuthDb) im sqlite- und api-Modus; nur der
+// mock-Modus nutzt die In-Memory-Testanmeldung aus repository.js (admin/admin).
 const repo = process.env.DATA_SOURCE === "sqlite"
   ? require("../data/sqlRepository")
+  : process.env.DATA_SOURCE === "api"
+  ? require("../data/webAuthDb")
   : require("../data/repository");
 const { requireAuth, requireScope } = require("../middleware/auth");
 const {

@@ -5,8 +5,12 @@
 // Session token travels only as the httpOnly "session" cookie — never a
 // header, never localStorage.
 
+// Must match routes/auth.js: the real user store (webAuthDb) in sqlite and
+// api mode, the in-memory test login from repository.js only in mock mode.
 const repo = process.env.DATA_SOURCE === "sqlite"
   ? require("../data/sqlRepository")
+  : process.env.DATA_SOURCE === "api"
+  ? require("../data/webAuthDb")
   : require("../data/repository");
 
 // Named scopes the app checks for (requireScope("library.read"/"library.write")),
