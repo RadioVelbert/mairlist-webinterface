@@ -69,11 +69,13 @@ New-NetFirewallRule -DisplayName "mAirListDB Server (Coolify)" -Direction Inboun
 
 | | **A: über einen Namen** | **B: direkt über IP und Port** |
 |---|---|---|
-| Beispiel | `http://mairlist.intern.lan` | `http://<COOLIFY-IP>:8841` |
-| Voraussetzung | interner DNS-Eintrag, der auf den Coolify-Host zeigt | keine |
+| Beispiel | `http://mairlist.intern.lan` | `http://<COOLIFY-IP>:<PORT>` |
+| Voraussetzung | interner DNS-Eintrag, der auf den Coolify-Host zeigt | ein freier Port auf dem Coolify-Host, z.B. `4500` |
 | Feld **Domains** | `http://mairlist.intern.lan` | leer lassen |
-| Feld **Ports Mappings** | leer | `8841:8841` |
+| Feld **Ports Mappings** | leer | `<PORT>:8841`, z.B. `4500:8841` (links der Port auf dem Host, frei wählbar; rechts immer `8841`) |
 | Zusätzliche Variable | – | `TRUST_PROXY=false` |
+
+> **Keinen Port ins Feld Domains schreiben**, um einen anderen Port von außen zu bekommen: Coolify versteht `http://…:4500` dort als Port *im Container*, erreichbar bleibt die App über Port 80 — Ergebnis „502 Bad Gateway“. Einen eigenen Port von außen gibt es nur über **Ports Mappings** (Variante B).
 
 Ohne internen DNS ist **B** der schnellste Weg. Eine von Coolify vorgeschlagene `…sslip.io`-Domain funktioniert im LAN nur, wenn der Router DNS-Antworten mit privaten IPs nicht blockiert (FritzBoxen tun das standardmäßig) — im Zweifel löschen.
 
@@ -221,6 +223,6 @@ Zeigt `API_DB_TLS_CERT` auf einen Schlüssel oder enthält etwas anderes als ein
 | Speichern schlägt fehl, `CORS: Origin nicht erlaubt` | `ALLOWED_ORIGINS` passt nicht exakt zur Adresse im Browser |
 | Login „springt zurück“ | `COOKIE_SECURE=true` bei `http://` |
 | Benutzer nach Deploy weg | Volume `/data` fehlt |
-| `Bad Gateway` / 404 von Coolify | **Ports Exposes** ist nicht `8841` |
+| `Bad Gateway` / 404 von Coolify | **Ports Exposes** ist nicht `8841`, oder im Feld **Domains** steht ein Port (siehe [Schritt 3](#3-erreichbarkeit-festlegen)) |
 | Nach 5 Fehlversuchen können sich alle nicht mehr einloggen | `TRUST_PROXY` fehlt hinter Traefik (Variante A) |
 | `database is locked` im Log | mAirListDB Server überlastet, ggf. `API_DB_MAX_CONCURRENT` senken |
