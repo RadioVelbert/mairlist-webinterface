@@ -25,30 +25,60 @@ const REQUEST_TIMEOUT_MS = 10000;
 // API_DB_TLS_CERT instead pins exactly that certificate for mAirListDB
 // requests only: it replaces the default CA list for these connections, so
 // only a server holding that certificate's key gets through, and the
-// hostname check adds nothing on top and is skipped. Relative paths resolve
-// against the server/ directory. The file may be PEM or DER (Windows .cer
-// files come in both); X509Certificate reads either and normalizes to the
-// PEM that the `ca` option requires. undici is required lazily so setups
-// without API_DB_TLS_CERT don't depend on it.
+// hostname check adds nothing on top and is skipped.
+//
+// API_DB_TLS_CERT is either the certificate itself (PEM content pasted into
+// the env var, so no station-specific file has to live in the repo) or a
+// path to a PEM/DER file (Windows .cer files come in both), relative paths
+// resolving against the server/ directory. X509Certificate reads either
+// format and normalizes to the PEM that the `ca` option requires. undici is
+// required lazily so setups without API_DB_TLS_CERT don't depend on it.
 const API_DB_TLS_CERT = process.env.API_DB_TLS_CERT;
+
+const fs = require("fs");
+// Not `path`: several functions below take a URL path parameter by that name
+const nodePath = require("path");
+
+const PEM_CERT_RE = /-----BEGIN CERTIFICATE-----([\s\S]*?)-----END CERTIFICATE-----/;
+
+function isInlineCert(value) {
+  return value.includes("-----BEGIN");
+}
+
+function describeCertSource(value) {
+  return isInlineCert(value) ? "Inhalt von API_DB_TLS_CERT" : nodePath.resolve(__dirname, "..", value);
+}
+
+// Returns PEM text or file contents for X509Certificate. Env vars don't
+// reliably keep line breaks (Coolify/Docker may cut a multi-line value or
+// turn breaks into literal "\n" or spaces), so inline PEM is rebuilt from
+// its base64 body, and a truncated value fails loudly instead of being
+// misread as a file path.
+function readPinnedCert(value) {
+  if (!isInlineCert(value)) return fs.readFileSync(describeCertSource(value));
+
+  const match = PEM_CERT_RE.exec(value);
+  if (!match) throw new Error("kein vollständiger BEGIN/END-CERTIFICATE-Block, Wert abgeschnitten?");
+  const lines = match[1].replace(/\\n|\s/g, "").match(/.{1,64}/g) || [];
+  return `-----BEGIN CERTIFICATE-----\n${lines.join("\n")}\n-----END CERTIFICATE-----\n`;
+}
 
 function createApiFetch() {
   if (!API_DB_TLS_CERT) return fetch;
 
-  const fs = require("fs");
-  const path = require("path");
   const { X509Certificate } = require("crypto");
   const { Agent, fetch: undiciFetch } = require("undici");
 
-  const certPath = path.resolve(__dirname, "..", API_DB_TLS_CERT);
-  let ca;
+  const source = describeCertSource(API_DB_TLS_CERT);
+  let cert;
   try {
-    ca = new X509Certificate(fs.readFileSync(certPath)).toString();
+    cert = new X509Certificate(readPinnedCert(API_DB_TLS_CERT));
   } catch (err) {
-    throw new Error(`API_DB_TLS_CERT: kein lesbares Zertifikat unter ${certPath} (${err.code || err.message})`);
+    throw new Error(`API_DB_TLS_CERT: kein lesbares Zertifikat (${source}: ${err.code || err.message})`);
   }
-  console.log(`mAirListDB Server TLS: gepinntes Zertifikat ${certPath}`);
+  console.log(`mAirListDB Server TLS: gepinntes Zertifikat aus ${source}, gültig bis ${cert.validTo}`);
 
+  const ca = cert.toString();
   const dispatcher = new Agent({ connect: { ca, checkServerIdentity: () => undefined } });
   return (url, options) => undiciFetch(url, { ...options, dispatcher });
 }

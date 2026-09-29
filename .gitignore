@@ -16,7 +16,9 @@ frontend/dist-ssr/
 *.log
 npm-debug.log*
 
-# Private Schlüssel nie committen — in server/certs/ gehören nur Zertifikate
+# Zertifikate und Schlüssel gehören nicht ins Repo — das Zertifikat des
+# mAirListDB Servers kommt per API_DB_TLS_CERT (siehe COOLIFY.md)
+server/certs/
 *.key
 *-key.pem
 *_key.pem
